@@ -13,6 +13,7 @@ Whether you’re automating tasks, securing workflows, or simply trying to remem
 - 🤖 **Suggest** alternatives when your memory draws a blank
 - ⬆️ **Upgrade** itself from a URL or GitHub repo
 - 🔒 Designed for **private use** and controlled self-enhancement
+- 💎 **Premium** interactive interface via `qc premium`
 
 ---
 
@@ -30,4 +31,5 @@ qc learn "start server" "npm run dev" -t dev,local
 qc recall "run server"
 qc suggest "build project"
 qc upgrade --url https://yourdomain.com/modules/update.js
+qc premium
 
