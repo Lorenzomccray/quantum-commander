@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+import QuantumCommander from '/workspaces/quantum-commander/lib/QuantumCommander.js';
+
+try {
+  new QuantumCommander().run();
+} catch (err) {
+  console.error('[QuantumCommander] Startup failed:', err.message);
+  process.exit(1);
+}
