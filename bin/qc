@@ -1,9 +1,20 @@
 #!/usr/bin/env node
 
-import QuantumCommander from '/workspaces/quantum-commander/lib/QuantumCommander.js';
+import { existsSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const here = dirname(fileURLToPath(import.meta.url));
+
+let commanderPath = resolve(here, '../lib/QuantumCommander.js');
+if (!existsSync(commanderPath)) {
+  commanderPath = resolve(here, 'lib/QuantumCommander.js');
+}
+
+const { default: QuantumCommander } = await import(`file://${commanderPath}`);
 
 try {
-  new QuantumCommander().run();
+  await new QuantumCommander().run();
 } catch (err) {
   console.error('[QuantumCommander] Startup failed:', err.message);
   process.exit(1);
