@@ -13,6 +13,7 @@ Whether you’re automating tasks, securing workflows, or simply trying to remem
 - 🤖 **Suggest** alternatives when your memory draws a blank
 - ⬆️ **Upgrade** itself from a URL or GitHub repo
 - 🔒 Designed for **private use** and controlled self-enhancement
+- 🗂️ **List** saved commands with tags and metadata
 
 ---
 
@@ -29,5 +30,7 @@ npm link
 qc learn "start server" "npm run dev" -t dev,local
 qc recall "run server"
 qc suggest "build project"
+qc list
 qc upgrade --url https://yourdomain.com/modules/update.js
+```
 
