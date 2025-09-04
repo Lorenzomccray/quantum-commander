@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Commander</title>
+<style>
+:root {
+  --primary: #673ab7;
+  --primary-light: #8561c5;
+  --secondary: #f3e5f5;
+  --text: #333;
+  --background: #fafafa;
+  --surface: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --text:#e0e0e0; --background:#121212; --surface:#1e1e1e; --secondary:#2d0036; }
+}
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; background:var(--background); color:var(--text); }
+.container { max-width: 100%; padding: 1rem; margin: 0 auto; }
+.header { background: var(--primary); color:#fff; padding: 1.5rem 1rem; margin: -1rem -1rem 1rem -1rem; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+.header h1 { font-size: 1.8rem; font-weight: 600; }
+.quick-actions { display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap:.5rem; margin:1rem 0; }
+.quick-btn { background: var(--primary-light); color:#fff; border:none; padding:.9rem; border-radius: 12px; font-size:.95rem; cursor:pointer; }
+.quick-btn:active { filter: brightness(.92); }
+#chat { display:flex; flex-direction:column; gap:.8rem; margin:1rem 0; max-height: 60vh; overflow-y:auto; }
+.msg { padding: 1rem; border-radius: 18px; line-height: 1.4; max-width: 85%; word-wrap: break-word; animation: fadeIn .18s ease-in; }
+.user { background: var(--primary); color:#fff; align-self:flex-end; margin-left:auto; }
+.agent { background: var(--secondary); color:var(--text); align-self:flex-start; white-space: pre-wrap; }
+#composer { display:flex; gap:.5rem; margin-top:1rem; position: sticky; bottom: 0; background:var(--surface); padding: .75rem; border-radius: 18px; box-shadow: 0 -2px 10px rgba(0,0,0,.05); }
+#composer input { flex:1; padding: .9rem; border:2px solid var(--primary-light); border-radius: 14px; font-size: 1rem; background:var(--surface); color:var(--text); min-height:44px; }
+#composer button { padding:.9rem 1.2rem; border:none; border-radius:14px; background:var(--primary); color:#fff; font-weight:600; cursor:pointer; min-width:60px; }
+@keyframes fadeIn { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header"><h1>Quantum Commander</h1></div>
+
+    <div class="quick-actions">
+      <button class="quick-btn" data-action="brightness 70">🌞 Brightness 70%</button>
+      <button class="quick-btn" data-action="battery_check">🔋 Battery</button>
+      <button class="quick-btn" data-action="system_load">📊 System Load</button>
+      <button class="quick-btn" data-action="update">🔄 Update</button>
+    </div>
+
+    <div id="chat"></div>
+
+    <form id="composer">
+      <input type="text" name="message" placeholder="Ask or command..." autocomplete="off" />
+      <button type="submit">▶️</button>
+    </form>
+  </div>
+
+<script>
+let ws;
+function ensureWS() {
+  if (ws && ws.readyState === WebSocket.OPEN) return ws;
+  ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+  ws.onopen = () => console.log('WS connected');
+  ws.onclose = () => console.log('WS closed');
+  ws.onmessage = (evt) => {
+    const text = String(evt.data ?? '');
+    const chat = document.getElementById('chat');
+    const agent = document.createElement('div');
+    agent.className = 'msg agent';
+    agent.textContent = text;
+    chat.appendChild(agent);
+    chat.scrollTop = chat.scrollHeight;
+  };
+  return ws;
+}
+
+function pushUser(text) {
+  const chat = document.getElementById('chat');
+  const user = document.createElement('div');
+  user.className = 'msg user';
+  user.textContent = text;
+  chat.appendChild(user);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+document.querySelectorAll('.quick-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.getAttribute('data-action');
+    if (!action) return;
+    pushUser(action);
+    ensureWS().send(action);
+  });
+});
+
+const form = document.getElementById('composer');
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = form.querySelector('input[name="message"]');
+  const text = (input.value || '').trim();
+  if (!text) return;
+  pushUser(text);
+  ensureWS().send(text);
+  input.value = '';
+});
+</script>
+</body>
+</html>
+
