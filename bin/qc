@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const { default: QuantumCommander } = await import(join(__dirname, '../lib/QuantumCommander.js'));
+
+try {
+  new QuantumCommander().run();
+} catch (err) {
+  console.error('[QuantumCommander] Startup failed:', err.message);
+  process.exit(1);
+}

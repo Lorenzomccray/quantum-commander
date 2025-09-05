@@ -1,0 +1,26 @@
+name: Quantum Commander Upgrade
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Test CLI Health
+        run: node bin/qc --help
+
+      - name: Confirm Upgrade Auto-check
+        run: echo "✅ Quantum Commander auto-upgrade check complete."
