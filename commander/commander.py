@@ -18,12 +18,22 @@ app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 templates_dir = repo_root / "templates"
 templates = Jinja2Templates(directory=str(templates_dir))
 
+# Try to import a project-defined make_agent; otherwise use a simple echo stub.
+try:
+    from .agent import make_agent as _make_agent  # type: ignore
+    make_agent = _make_agent  # re-export
+except Exception:
+    def make_agent():
+        class _EchoAgent:
+            def run_persisted(self, message: str) -> str:
+                return f"Echo: {message}"
+        return _EchoAgent()
+
 _AGENT = None
 
 def get_agent():
     global _AGENT
     if _AGENT is None:
-        # Assumes make_agent() is available in the module scope or imported elsewhere
         _AGENT = make_agent()
     return _AGENT
 
