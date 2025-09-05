@@ -6,11 +6,17 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from dotenv import load_dotenv
 
 app = FastAPI(title="Quantum Commander")
 
 # repo-root-based paths
 repo_root = pathlib.Path(__file__).resolve().parent.parent
+# Load .env from repo root if present
+try:
+    load_dotenv(dotenv_path=str(repo_root / ".env"), override=False)
+except Exception:
+    pass
 static_dir = repo_root / "static"
 static_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
